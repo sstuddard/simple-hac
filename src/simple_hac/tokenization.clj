@@ -49,12 +49,12 @@
 (defn get-tfidf-vector
   "Given a tf vector and idf function, apply idf weighting"
   [v gidf-fn]
-  (normalize (apply merge
+  (apply merge
     (map (fn [[k v]] 
             (if (gidf-fn k)
               {k (* v (gidf-fn k))}
               {}))
-      v))))
+      v)))
 
 (defn idf
   "Generate idf lookup from a set of documents"
@@ -68,9 +68,8 @@
 
 (defn idf-fn 
   "Generates an idf lookup fn"
-  [documents]
+  [documents idf-table]
   (let [vocabulary (get-vocabulary documents)
-        term-lookup (vocab-index-lookup vocabulary)
-        idf-table (idf documents)]
+        term-lookup (vocab-index-lookup vocabulary)]
     (fn [term]
       (idf-table (term-lookup term)))))
