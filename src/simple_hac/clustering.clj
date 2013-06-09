@@ -3,6 +3,10 @@
             [simple-hac.geometry :as geo]
             [simple-hac.util :as util]))
 
+(def calculate-centroid (memoize geo/calculate-centroid))
+(def euclidean-distance (memoize geo/euclidean-distance))
+(def nearest-neighbor (memoize geo/nearest-neighbor))
+
 (defn similarity-calculator
   "A specialized similarity calculator that will memoize bi-directional pairs"
   []
@@ -42,17 +46,18 @@
   "Returns a comparator function for centroid link agglomerative clustering"
   []
   (fn [c1 c2]
-    (let [c1-centroid (geo/calculate-centroid c1)
-          c2-centroid (geo/calculate-centroid c2)]
-      (/ 1 (geo/euclidean-distance c1-centroid c2-centroid)))))
+    (let [c1-centroid (calculate-centroid c1)
+          c2-centroid (calculate-centroid c2)
+          distance (euclidean-distance c1-centroid c2-centroid)]
+      (if (zero? distance) 1 (/ 1 distance)))))
 
  (defn medoid-link-clustering
   "Returns a comparator function for medoid (member nearest to centroid) link agglomerative clustering"
   []
   (let [calc (similarity-calculator)]
     (fn [c1 c2]
-      (let [m1 (geo/nearest-neighbor c1 (geo/calculate-centroid c1))
-            m2 (geo/nearest-neighbor c2 (geo/calculate-centroid c2))]
+      (let [m1 (nearest-neighbor c1 (calculate-centroid c1))
+            m2 (nearest-neighbor c2 (calculate-centroid c2))]
         (calc m1 m2)))))
  
 (defn cluster-next
