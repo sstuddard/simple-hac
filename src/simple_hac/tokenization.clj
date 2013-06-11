@@ -57,14 +57,14 @@
       v)))
 
 (defn idf
-  "Generate idf lookup from a set of documents"
   [documents]
-  (let [vocabulary (get-vocabulary documents)]
-    (zipmap vocabulary
-      (for [term vocabulary] 
-        (java.lang.Math/log (/ (count documents) 
-          (reduce + 
-            (for [doc documents] (if (some #{term} doc) 1 0)))))))))
+  (let [vocabulary (get-vocabulary documents)
+        freqs (map frequencies documents)
+        doc-count (count documents)]
+    (letfn [(count-term-in-docs [freq term]
+              (reduce + (for [d freq] (if (contains? d term) 1 0))))]
+      (into {} (map 
+        #(vector % (java.lang.Math/log (/ doc-count (count-term-in-docs freqs %)))) vocabulary)))))
 
 (defn idf-fn 
   "Generates an idf lookup fn"

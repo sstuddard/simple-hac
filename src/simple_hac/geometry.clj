@@ -32,7 +32,7 @@
   "Calculate new centroid based on a list of vectors"
   [v]
   (let [n (count v)]
-    (util/remap (reduce vectorz/add-vectors v) #(/ % n))))
+    (vectorz/normalize (util/remap (reduce vectorz/add-vectors v) #(/ % n)))))
 
 (defn nearest-neighbor
   "Returns the vector closest to the specified target vector"

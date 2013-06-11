@@ -45,11 +45,11 @@
  (defn centroid-link-clustering
   "Returns a comparator function for centroid link agglomerative clustering"
   []
-  (fn [c1 c2]
-    (let [c1-centroid (calculate-centroid c1)
-          c2-centroid (calculate-centroid c2)
-          distance (euclidean-distance c1-centroid c2-centroid)]
-      (if (zero? distance) 1 (/ 1 distance)))))
+  (let [calc (similarity-calculator)]
+    (fn [c1 c2]
+      (let [c1-centroid (calculate-centroid c1)
+            c2-centroid (calculate-centroid c2)]
+        (calc c1-centroid c2-centroid)))))
 
  (defn medoid-link-clustering
   "Returns a comparator function for medoid (member nearest to centroid) link agglomerative clustering"
